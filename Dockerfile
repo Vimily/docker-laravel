@@ -1,6 +1,6 @@
 FROM vimily/php-dockerize
 
-RUN apt-get install -yq libpng-dev libicu-dev libjpeg62-turbo-dev && \
+RUN apt-get install -yq libpng-dev libicu-dev libjpeg62-turbo-dev git && \
     docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ && \
     docker-php-ext-install -j$(nproc) gd pcntl intl zip pdo_mysql && \
     php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" && \

@@ -1,6 +1,6 @@
 FROM vimily/php-dockerize:alpine
 
-RUN apk add jpeg-dev libpng-dev icu-dev && \
+RUN apk add jpeg-dev libpng-dev icu-dev git && \
     docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ && \
     docker-php-ext-install -j$(nproc) gd pcntl intl zip pdo_mysql && \
     php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" && \
