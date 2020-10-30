@@ -1,11 +1,14 @@
 FROM vimily/php-dockerize:fpm-alpine
 
-RUN apk add jpeg-dev libpng-dev libzip-dev icu-dev freetype-dev git php7-pecl-mailparse && \
-    docker-php-ext-enable /usr/lib/php7/modules/mailparse.so && \
-    docker-php-ext-configure gd --with-jpeg-dir=usr/ --with-freetype-dir=usr/ && \
+ENV BUILD_TOOLS autoconf g++ make jpeg-dev libpng-dev libzip-dev icu-dev freetype-dev 
+
+RUN apk add git $BUILD_TOOLS && \
+    pecl install mailparse && \
+    docker-php-ext-enable mailparse && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) gd pcntl intl zip pdo_mysql exif && \
     php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" && \
-    php /tmp/composer-setup.php --install-dir=/usr/bin --filename=composer && \
+    php /tmp/composer-setup.php --install-dir=/usr/bin --filename=composer --version=1.10.16 && \
     php -r "unlink('/tmp/composer-setup.php');" && \
-    composer global require "hirak/prestissimo:^0.2"
+    composer global require "hirak/prestissimo"
 
