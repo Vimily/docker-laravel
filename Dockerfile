@@ -1,10 +1,13 @@
-FROM vimily/php-dockerize
+FROM vimily/php-dockerize:fpm-alpine
 
-RUN apt-get install -yq libpng-dev libicu-dev libjpeg62-turbo-dev libzip-dev git && \
-    docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ && \
-    docker-php-ext-install -j$(nproc) gd pcntl intl zip pdo_mysql bcmath && \
-    php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" && \
-    php /tmp/composer-setup.php --install-dir=/usr/bin --filename=composer && \
-    php -r "unlink('/tmp/composer-setup.php');" && \
-    composer global require "hirak/prestissimo:^0.2"
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+ENV BUILD_TOOLS autoconf g++ make jpeg-dev libpng-dev libzip-dev icu-dev freetype-dev 
+ENV DOCKER_EXT gd pcntl intl zip pdo_mysql exif
+
+RUN apk add git $BUILD_TOOLS && \
+    pecl install mailparse redis && \
+    docker-php-ext-enable mailparse && \
+    docker-php-ext-enable redis && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) $DOCKER_EXT
